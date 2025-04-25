@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <nav>
+      <img class="Logo" src="logo.jpg" alt="logo"><span>BARANGAY HEALTH CENTER MANAGEMENT SYSTEM</span>
+      <ul class="our-nav">
+            </nav>
+  <form autocomplete="off" name="loginform" onSubmit="return validateForm();" action="dashboard.html" method="post">
+    <div class="input-group">
+        <label>GMAIL</label>
+  		<input type="text" name="usr" placeholder="gmail">
+  	</div>
+  	
+    <div class="input-group">
+        <label>PASSWORD</label>
+  		<input type="password" name="pword" placeholder="password">
+  	</div><br>
+
+    
+    <input class="btn" type="submit" value="Login"><br>
+    <br><label>
+        <input type="checkbox" name="remember"> Remember Me&emsp;<a href="forgot.html"><b>Forgot Password?</b></a>
+    </label>
+
+
+    <br>
+  	
+    <p>
+  		<br><a href="register.html">Don't have an account?&nbsp;<b>Register</b></a>
+  	</p>
+</div>
+
+</body>
+
+<script>
+function validateForm() 
+{
+        var un = document.loginform.usr.value;
+        var pw = document.loginform.pword.value;
+        var gmail = ""; 
+        var password = "";
+    
+        const users = [
+{
+gmail: "admin@gmail.com",
+password: "admin123",
+},
+
+        ]
+
+            
+        
+        const user_login = (gmail,password) => {
+            return users.filter((user) => user.gmail==gmail && user.password==password).length > 0;
+        }
+            if (user_login(un,pw))
+        {
+            alert("Login was successfully");
+            return true;
+        }
+
+            else if (un.length == 0)
+        {
+            alert ("Login was unsuccessful, please check your gmail");
+             return false;
+        }
+
+            else if (pw.length == 0) 
+        {
+            alert ("Login was unsuccessful, please check your password");
+             return false;
+        }
+
+        else 
+        {   
+            alert ("Login was unsuccessful, please check your gmail and password");
+            return false;
+        }
+}
+</script>
+</html>

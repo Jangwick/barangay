@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Barangay Healthcare System</title>
+    <!-- Tailwind CSS from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Style for active sidebar link */
+        .sidebar-active {
+            background-color: #1D4ED8; /* Darker blue */
+            color: white;
+            font-weight: 600;
+        }
+        .sidebar-link:hover {
+            background-color: #3B82F6; /* Lighter blue on hover */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex h-screen">
+    <!-- Sidebar -->
+    <div class="bg-blue-800 text-white w-64 py-4 flex-shrink-0 hidden md:block">
+        <div class="px-6">
+            <h1 class="text-2xl font-bold mb-8">Barangay System</h1>
+            <nav>
+                <a href="{{ url_for('index') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('index') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                </a>
+                
+                <!-- Barangay Management - Conditionally hide for doctors and nurses -->
+                {% if current_user.role != 'doctor' and current_user.role != 'nurse' %}
+                <div class="mb-4">
+                    <p class="text-xs uppercase text-gray-400 font-semibold mb-2 pl-4">Barangay Management</p>
+                    <a href="{{ url_for('residents') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('residents') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-users mr-2"></i> Residents
+                    </a>
+                    <a href="{{ url_for('certificates') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('certificates') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-certificate mr-2"></i> Certificates
+                    </a>
+                    <a href="{{ url_for('announcements') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('announcements') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-bullhorn mr-2"></i> Announcements
+                    </a>
+                    <a href="{{ url_for('blotter') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path.startswith('/blotter') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-book mr-2"></i> Blotter
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Healthcare Management - Conditionally hide for staff -->
+                {% if current_user.role != 'staff' %}
+                <div class="mb-4">
+                    <p class="text-xs uppercase text-gray-400 font-semibold mb-2 pl-4">Healthcare</p>
+                    <a href="{{ url_for('patients') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('patients') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-hospital-user mr-2"></i> Patients
+                    </a>
+                    <a href="{{ url_for('appointments') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('appointments') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-calendar-check mr-2"></i> Appointments
+                    </a>
+                    <a href="{{ url_for('inventory') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('inventory') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-box mr-2"></i> Inventory
+                    </a>
+                </div>
+                {% endif %}
+                
+                <!-- Administration (Admin only) -->
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                <div class="mb-4">
+                    <p class="text-xs uppercase text-gray-400 font-semibold mb-2 pl-4">Administration</p>
+                    <a href="{{ url_for('users') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('users') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-user-shield mr-2"></i> User Management
+                    </a>
+                    <a href="{{ url_for('audit_logs') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('audit_logs') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                        <i class="fas fa-clipboard-list mr-2"></i> Audit Logs
+                    </a>
+                </div>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top header -->
+        <header class="bg-white shadow-sm py-4 px-4">
+            <div class="flex items-center justify-between">
+                <button id="menu-btn" class="md:hidden text-gray-500 focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="text-lg font-semibold text-blue-800">{{ title }}</div>
+                {% if current_user.is_authenticated %}
+                <div class="flex items-center">
+                    <span class="text-gray-600 mr-4">{{ current_user.username }} ({{ current_user.role|capitalize }})</span>
+                    <a href="{{ url_for('logout') }}" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 md:hidden hidden">
+            <div class="bg-blue-800 text-white w-64 h-full overflow-y-auto py-4">
+                <div class="px-6">
+                    <div class="flex items-center justify-between mb-8">
+                        <h1 class="text-2xl font-bold">Barangay System</h1>
+                        <button id="close-menu" class="text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <nav>
+                        <a href="{{ url_for('index') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('index') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                        </a>
+                        
+                        <!-- Barangay Management - Conditionally hide for doctors and nurses -->
+                        {% if current_user.role != 'doctor' and current_user.role != 'nurse' %}
+                        <p class="text-xs uppercase text-gray-400 font-semibold mt-4 mb-2 pl-4">Barangay Management</p>
+                        <a href="{{ url_for('residents') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('residents') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-users mr-2"></i> Residents
+                        </a>
+                        <a href="{{ url_for('certificates') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('certificates') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-certificate mr-2"></i> Certificates
+                        </a>
+                        <a href="{{ url_for('announcements') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('announcements') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-bullhorn mr-2"></i> Announcements
+                        </a>
+                        <a href="{{ url_for('blotter') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path.startswith('/blotter') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-book mr-2"></i> Blotter
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Healthcare Management - Conditionally hide for staff -->
+                        {% if current_user.role != 'staff' %}
+                        <p class="text-xs uppercase text-gray-400 font-semibold mt-4 mb-2 pl-4">Healthcare</p>
+                        <a href="{{ url_for('patients') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('patients') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-hospital-user mr-2"></i> Patients
+                        </a>
+                        <a href="{{ url_for('appointments') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('appointments') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-calendar-check mr-2"></i> Appointments
+                        </a>
+                        <a href="{{ url_for('inventory') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('inventory') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-box mr-2"></i> Inventory
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Administration (Admin only) -->
+                        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                        <p class="text-xs uppercase text-gray-400 font-semibold mt-4 mb-2 pl-4">Administration</p>
+                        <a href="{{ url_for('users') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('users') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-user-shield mr-2"></i> User Management
+                        </a>
+                        <a href="{{ url_for('audit_logs') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('audit_logs') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
+                            <i class="fas fa-clipboard-list mr-2"></i> Audit Logs
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content area -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="mb-4 px-4 py-3 rounded-lg border {% if category == 'danger' %}bg-red-100 border-red-300 text-red-800{% elif category == 'success' %}bg-green-100 border-green-300 text-green-800{% elif category == 'warning' %}bg-yellow-100 border-yellow-300 text-yellow-800{% else %}bg-blue-100 border-blue-300 text-blue-800{% endif %} flex items-center gap-3" role="alert">
+                    {% if category == 'danger' %}<i class="fas fa-times-circle"></i>
+                    {% elif category == 'success' %}<i class="fas fa-check-circle"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                    {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Main JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menu-btn')?.addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.remove('hidden');
+        });
+        
+        document.getElementById('close-menu')?.addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.add('hidden');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.getElementById('mobile-menu')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

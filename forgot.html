@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Forgot Password </title>
+    <link rel="stylesheet" type="text/css" href="forgot.css">
+    <script src="https://kit.fontawesome.com/16943cbac0.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('resetForm').addEventListener('submit', function (event) {
+                event.preventDefault(); 
+
+                
+                alert('Submitted, Reset your password now!');
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <img src="logo.jpg">
+        <div class="login-form"><br><br><br>
+            <div class="form-header">
+                <h1><center><b>FIND YOUR ACCOUNT<b></center></h1>
+                <p><center><h3>Enter your email to search for your account</h3></center></p>
+            </div>
+            <br>
+            <br>
+            <form id="resetForm">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Reset Password</button>
+                </div>
+            </form>
+            <div class="form-footer">
+                <p>Remembered your password? <a href="login.html">Login</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

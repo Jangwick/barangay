@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        .content h2 {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .details p {
+            margin: 10px 0;
+        }
+        .details strong {
+            display: inline-block;
+            width: 150px; /* Adjust as needed */
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: right; /* Or adjust as needed */
+            font-size: 14px;
+        }
+        @media print {
+            body {
+                margin: 0;
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none;
+            }
+            .header, .content, .footer {
+                page-break-inside: avoid;
+            }
+        }
+        .print-button, .back-button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            margin-right: 10px; /* Add some space between buttons */
+        }
+        .print-button {
+            background-color: #007bff;
+        }
+        .back-button {
+            background-color: #6c757d; /* Gray color for back button */
+        }
+    </style>
+</head>
+<body>
+
+    <button onclick="window.print()" class="print-button no-print">Print this page</button>
+    <button onclick="window.location.href='{{ url_for('certificates') }}'" class="back-button no-print">Go Back to List</button>
+
+    <div class="header">
+        <h1>Barangay Pag-asa</h1>
+        <p>Office of the Barangay Chairman</p>
+        <!-- Add more specific address/contact if needed -->
+    </div>
+
+    <div class="content">
+        <h2>{{ certificate.type }}</h2>
+
+        <div class="details">
+            <p><strong>To Whom It May Concern:</strong></p>
+            
+            {% if certificate.resident %}
+            <p>This is to certify that <strong>{{ certificate.resident.first_name }} {{ certificate.resident.last_name }}</strong>, of legal age, Filipino, and a resident of {{ certificate.resident.address }}, is known to be of good moral character and law-abiding citizen of this community.</p>
+            {% else %}
+            <p>This is to certify that the resident associated with ID {{ certificate.resident_id }} is known to be of good moral character and law-abiding citizen of this community.</p>
+            {% endif %}
+
+            <p>This certification is issued upon the request of the above-named person for the purpose of <strong>{{ certificate.purpose }}</strong>.</p>
+
+            <p>Issued this <strong>{{ certificate.issue_date.strftime('%dth day of %B, %Y') }}</strong> at the Barangay Hall, Barangay Pag-asa.</p>
+            <!-- You might need to adjust the date format or wording -->
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>_________________________</p>
+        <p><strong>[Barangay Chairman's Name]</strong></p>
+        <p>Punong Barangay</p>
+        <br>
+        <p><em>Not valid without barangay seal.</em></p>
+        <p><small>Certificate ID: CERT-{{ certificate.id }}</small></p>
+        {% if certificate.issuer %}
+        <p><small>Issued by: {{ certificate.issuer.username }}</small></p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+* {
+  margin: 0;
+  padding: 0;
+
+  }
+ 
+  body {
+    font-size: 120%;
+    background-image: white;
+    background-size: cover;
+  
+  }
+
+  nav{
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    opacity: 90%;
+    padding: 1px;
+    background: whitesmoke;
+  }
+
+  li{
+    display: inline;
+    margin: 20px;
+}
+
+.Logo {
+    width: 6rem;
+    height: 6rem;
+    margin: 5px;
+    }
+
+span {
+    color: blue;
+    margin-right: auto;
+    font-size: 2rem;
+    font-family: 'poppins';  
+    border-radius: 20px;
+}
+  nav a{
+        text-decoration: none;
+        font-size: 20px;
+        color: black;
+        padding: 10px 20px;
+        transition: .3s ease;
+        font-family: Georgia;
+    }
+
+    nav a:hover{
+        background: white;
+        color: black;
+        border-radius: 20px;
+    }
+
+  form {
+    width: 400px;
+    margin: 0px auto;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    margin-top: 6rem;
+    opacity: 90%;
+    border: 5px outset silver;
+    background-color: whitesmoke;
+  }
+    .input-group {
+    margin: 10px 10px 10px 10px;
+  }
+
+  .input-group label {
+    display: block;
+    text-align: center;
+    margin: 3px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+    color: black;
+  } 
+  
+  .input-group input {
+    height: 30px;
+    width: 70%;
+    padding: 5px 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 2px solid black;
+ }
+
+  .btn {
+    float: center;
+    width: 200px;
+    padding: 5px;
+    font-size: 20px;
+    color: white;
+    background: black;
+    border: none;
+    height: 50px;
+    border-radius: 20px;
+  }
+  .btn:hover {
+     color: white;
+     background-color: blue;
+  }
+
+  .p {
+    color: black;
+    text-decoration: none;
+    text-align: left;
+  }
+ 
+  a {
+    color: black;
+    text-decoration: none;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+  }
+
+  img {
+    margin-left: 500px;
+  }
+  

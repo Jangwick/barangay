@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6 flex items-center">
+        <div class="rounded-full bg-blue-100 p-3 mr-4">
+            <i class="fas fa-users text-blue-600 text-xl"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm">Total Residents</p>
+            <p class="text-2xl font-bold">{{ total_residents }}</p>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 flex items-center">
+        <div class="rounded-full bg-green-100 p-3 mr-4">
+            <i class="fas fa-hospital-user text-green-600 text-xl"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm">Registered Patients</p>
+            <p class="text-2xl font-bold">{{ total_patients }}</p>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 flex items-center">
+        <div class="rounded-full bg-yellow-100 p-3 mr-4">
+            <i class="fas fa-calendar-check text-yellow-600 text-xl"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm">Total Appointments</p>
+            <p class="text-2xl font-bold">{{ total_appointments }}</p>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 flex items-center">
+        <div class="rounded-full bg-red-100 p-3 mr-4">
+            <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+        </div>
+        <div>
+            <p class="text-gray-500 text-sm">Low Stock Items</p>
+            <p class="text-2xl font-bold">{{ inventory_alerts }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Upcoming Appointments -->
+    <div class="lg:col-span-2 bg-white rounded-lg shadow">
+        <div class="border-b px-6 py-4 flex items-center justify-between">
+            <h2 class="font-semibold text-lg">Upcoming Appointments</h2>
+            <a href="{{ url_for('appointments') }}" class="text-blue-600 hover:underline text-sm">View All</a>
+        </div>
+        <div class="p-6 overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% if upcoming_appointments %}
+                        {% for appointment in upcoming_appointments %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-medium text-gray-900">
+                                    {{ appointment.patient.resident.first_name }} {{ appointment.patient.resident.last_name }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ appointment.appointment_date.strftime('%b %d, %Y - %I:%M %p') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Dr. {{ appointment.doctor.username }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-500">
+                                {{ appointment.purpose|truncate(30) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                No upcoming appointments
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Inventory Alerts -->
+    <div class="bg-white rounded-lg shadow">
+        <div class="border-b px-6 py-4 flex items-center justify-between">
+            <h2 class="font-semibold text-lg">Inventory Alerts</h2>
+            <a href="{{ url_for('inventory') }}" class="text-blue-600 hover:underline text-sm">Manage Inventory</a>
+        </div>
+        <div class="p-6">
+            <div id="low-stock-items" class="space-y-4">
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-xl"></i>
+                    <p class="mt-2">Loading inventory data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Announcements -->
+<div class="bg-white rounded-lg shadow">
+    <div class="border-b px-6 py-4 flex items-center justify-between">
+        <h2 class="font-semibold text-lg">Recent Announcements</h2>
+        <a href="{{ url_for('announcements') }}" class="text-blue-600 hover:underline text-sm">View All</a>
+    </div>
+    <div class="p-6">
+        {% if announcements %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% for announcement in announcements %}
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <h3 class="font-semibold text-blue-800">{{ announcement.title }}</h3>
+                    <p class="mt-2 text-sm text-gray-600">{{ announcement.content|truncate(100) }}</p>
+                    <p class="mt-2 text-xs text-gray-500">{{ announcement.created_at.strftime('%b %d, %Y') }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-8 text-gray-500">
+                No announcements available.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Fetch low stock inventory items
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/inventory/low_stock')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('low-stock-items');
+                container.innerHTML = '';
+                
+                if (data.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-green-600">
+                            <i class="fas fa-check-circle text-2xl"></i>
+                            <p class="mt-2">All inventory items are well-stocked.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                data.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex items-center justify-between bg-red-50 p-3 rounded-lg';
+                    itemDiv.innerHTML = `
+                        <div>
+                            <p class="font-medium">${item.name}</p>
+                            <p class="text-sm text-gray-500">Quantity: ${item.quantity} ${item.unit}</p>
+                        </div>
+                        <div class="text-red-600 font-semibold">
+                            Reorder
+                        </div>
+                    `;
+                    container.appendChild(itemDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching inventory data:', error);
+                const container = document.getElementById('low-stock-items');
+                container.innerHTML = `
+                    <div class="text-center py-8 text-red-600">
+                        <i class="fas fa-exclamation-circle text-xl"></i>
+                        <p class="mt-2">Failed to load inventory data.</p>
+                    </div>
+                `;
+            });
+    });
+</script>
+{% endblock %}

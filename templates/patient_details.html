@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow mb-6">
+    <div class="border-b px-6 py-4 flex items-center justify-between">
+        <h2 class="font-semibold text-lg">Patient Information</h2>
+        <a href="{{ url_for('add_medical_record', patient_id=patient.id) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center text-sm">
+            <i class="fas fa-notes-medical mr-2"></i> Add Medical Record
+        </a>
+    </div>
+    
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h3 class="text-xl font-bold text-blue-800">{{ patient.resident.first_name }} {{ patient.resident.last_name }}</h3>
+            <p class="text-gray-600">{{ patient.resident.address }}</p>
+            <p class="text-gray-600">Contact: {{ patient.resident.contact_number }}</p>
+            <p class="text-gray-600">Birth Date: {{ patient.resident.birth_date.strftime('%B %d, %Y') if patient.resident.birth_date }}</p>
+        </div>
+        <div>
+            <p><span class="font-semibold">Blood Type:</span> {{ patient.blood_type or 'Not specified' }}</p>
+            <p><span class="font-semibold">Emergency Contact:</span> {{ patient.emergency_contact or 'Not specified' }}</p>
+            <p><span class="font-semibold">Emergency Number:</span> {{ patient.emergency_number or 'Not specified' }}</p>
+            <p><span class="font-semibold">Registered On:</span> {{ patient.created_at.strftime('%B %d, %Y') }}</p>
+        </div>
+        <div class="md:col-span-2">
+            <h4 class="font-semibold mb-1">Medical History:</h4>
+            <p class="text-gray-700 whitespace-pre-wrap">{{ patient.medical_history or 'No history provided.' }}</p>
+        </div>
+        <div class="md:col-span-2">
+            <h4 class="font-semibold mb-1">Allergies:</h4>
+            <p class="text-gray-700 whitespace-pre-wrap">{{ patient.allergies or 'No allergies reported.' }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Medical Records -->
+<div class="bg-white rounded-lg shadow mb-6">
+    <div class="border-b px-6 py-4">
+        <h2 class="font-semibold text-lg">Medical Records</h2>
+    </div>
+    <div class="p-6">
+        {% if medical_records %}
+            <div class="space-y-4">
+                {% for record in medical_records %}
+                <div class="border rounded-lg p-4 bg-gray-50">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-blue-700">Visit on {{ record.visit_date.strftime('%B %d, %Y at %I:%M %p') }}</h4>
+                        <span class="text-sm text-gray-500">Doctor: {{ record.doctor.username }}</span>
+                    </div>
+                    <p><span class="font-medium">Diagnosis:</span> {{ record.diagnosis }}</p>
+                    <p><span class="font-medium">Treatment:</span> {{ record.treatment or 'N/A' }}</p>
+                    <p><span class="font-medium">Prescription:</span> {{ record.prescription or 'N/A' }}</p>
+                    {% if record.notes %}
+                    <p><span class="font-medium">Notes:</span> {{ record.notes }}</p>
+                    {% endif %}
+                    {% if record.follow_up_date %}
+                    <p class="mt-2 text-sm text-yellow-700 font-medium">Follow-up needed by: {{ record.follow_up_date.strftime('%B %d, %Y') }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-gray-500">No medical records found for this patient.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Appointments -->
+<div class="bg-white rounded-lg shadow">
+    <div class="border-b px-6 py-4">
+        <h2 class="font-semibold text-lg">Appointment History</h2>
+    </div>
+    <div class="p-6 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% if appointments %}
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ appointment.appointment_date.strftime('%b %d, %Y - %I:%M %p') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            Dr. {{ appointment.doctor.username }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ appointment.purpose|truncate(50) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if appointment.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif appointment.status == 'scheduled' %}bg-blue-100 text-blue-800
+                                {% elif appointment.status == 'cancelled' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ appointment.status|capitalize }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No appointment history found.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

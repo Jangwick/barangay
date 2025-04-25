@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barangay Health Center Dashboard</title>
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f4f6f8;
+    }
+
+    .sidebar {
+      width: 220px;
+      background-color: #2c3e50;
+      color: white;
+      height: 100vh;
+      padding: 20px 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar img {
+      width: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .sidebar h2 {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      color: #ecf0f1;
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .sidebar a i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background-color: #34495e;
+    }
+
+    .logout {
+      margin-top: 20px;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .logout:hover {
+      background-color: #c0392b;
+    }
+
+    .main-wrapper {
+      margin-left: 220px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: calc(100% - 220px);
+    }
+
+    .navbar {
+      background-color: #2c3e50;
+      padding: 15px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar h1 {
+      font-size: 22px;
+      color: white;
+    }
+
+    .clock {
+      font-size: 16px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #2c3e50;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      font-size: 18px;
+      color: white;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .card h3 i {
+      margin-right: 10px;
+      color: #2980b9;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: white;
+    }
+
+    footer {
+      background-color: #2c3e50;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+      color: white;
+      border-top: 1px solid #ddd;
+    }
+
+    .sidebar .logo-container {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .breadcrumbs {
+      margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: black;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.breadcrumbs i {
+  color: #2980b9;
+  margin-right: 5px;
+}
+.appointments-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px); /* adjust depending on navbar + footer */
+  overflow: hidden;
+}
+
+.table-wrapper {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.search-bar {
+  margin-bottom: 15px;
+}
+
+.search-bar input {
+  padding: 10px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+th {
+  background: #2c3e50;
+  color: white;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status.scheduled {
+  background: #f39c12;
+  color: white;
+}
+
+.status.completed {
+  background: #2ecc71;
+  color: white;
+}
+
+.status.cancelled {
+  background: #e74c3c;
+  color: white;
+}
+
+
+
+
+
+
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <!-- Logo & System Name -->
+      <div class="logo-container">
+        <img src="logo.jpg" alt="Health Center Logo" />
+        <h2><i class="fas fa-clinic-medical"></i> BHCMS</h2>
+      </div>
+      <!-- Navigation -->
+      <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="patient.html"><i class="fas fa-user-injured"></i> Patient Records</a>
+      <a href="appointments.html"><i class="fas fa-calendar-check"></i> Appointments</a>
+      <a href="vaccinations.html"><i class="fas fa-syringe"></i> Vaccinations</a>
+      <a href="inventory.html"><i class="fas fa-boxes"></i> Inventory</a>
+      <a href="reports.html"><i class="fas fa-file-medical-alt"></i> Reports</a>
+      <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+    </div>
+    <!-- Logout -->
+    <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <div class="main-wrapper">
+    <div class="navbar">
+      <h1><i class="fas fa-tachometer-alt"></i> Barangay Health Center Dashboard</h1>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+
+      <div class="breadcrumbs">
+    <span><i class="fas fa-home"></i> Home</span>
+    <span>&gt;</span>
+    <span>Appointments</span>
+  </div>
+
+
+<!-- 👇 Start of Appointments Content -->
+<div class="appointments-container">
+  <div class="search-bar">
+    <input type="text" placeholder="Search by patient name or date...">
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Appointment ID</th>
+          <th>Patient Name</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Service</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>A001</td>
+          <td>Juan Dela Cruz</td>
+          <td>2025-04-26</td>
+          <td>09:00 AM</td>
+          <td>Check-up</td>
+          <td><span class="status scheduled">Scheduled</span></td>
+        </tr>
+        <tr>
+          <td>A002</td>
+          <td>Maria Santos</td>
+          <td>2025-04-26</td>
+          <td>10:30 AM</td>
+          <td>Vaccination</td>
+          <td><span class="status completed">Completed</span></td>
+        </tr>
+        <!-- Add more appointments as needed -->
+      </tbody>
+    </table>
+  </div>
+</div>
+<!-- 👆 End of Appointments Content -->
+
+
+    <footer>
+      &copy; 2025 Barangay Health Center Management System. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // Real-time clock
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString();
+      document.getElementById('clock').textContent = time;
+    }
+    setInterval(updateClock, 1000);
+    updateClock(); // run immediately on load
+  </script>
+
+</body>
+</html>

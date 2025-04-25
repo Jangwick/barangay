@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow">
+    <div class="border-b px-6 py-4">
+        <h2 class="font-semibold text-lg">Add Medical Record for {{ patient.resident.first_name }} {{ patient.resident.last_name }}</h2>
+        {% if appointment %}
+            <p class="text-sm text-gray-500">Related Appointment: {{ appointment.appointment_date.strftime('%b %d, %Y - %I:%M %p') }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="p-6">
+        <form method="POST" action="{{ url_for('add_medical_record', patient_id=patient.id) }}">
+            {% if appointment %}
+                <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+            {% endif %}
+            
+            <div class="mb-6">
+                <label for="diagnosis" class="block text-sm font-medium text-gray-700 mb-1">Diagnosis</label>
+                <textarea id="diagnosis" name="diagnosis" rows="4" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter the diagnosis details"></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label for="treatment" class="block text-sm font-medium text-gray-700 mb-1">Treatment Plan</label>
+                <textarea id="treatment" name="treatment" rows="4" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Describe the treatment provided or recommended"></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label for="prescription" class="block text-sm font-medium text-gray-700 mb-1">Prescription</label>
+                <textarea id="prescription" name="prescription" rows="3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="List any prescribed medications, dosage, and frequency"></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                <textarea id="notes" name="notes" rows="3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Any other relevant notes or observations"></textarea>
+            </div>
+            
+            <div class="mb-6">
+                <label for="follow_up_date" class="block text-sm font-medium text-gray-700 mb-1">Follow-up Date (Optional)</label>
+                <input type="date" id="follow_up_date" name="follow_up_date" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <a href="{{ url_for('patient_details', id=patient.id) }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md">Cancel</a>
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md">Save Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

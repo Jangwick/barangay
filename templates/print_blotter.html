@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .content h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .details p {
+            margin: 8px 0;
+        }
+        .details strong {
+            display: inline-block;
+            min-width: 150px; /* Adjust as needed */
+            margin-right: 10px;
+        }
+        .narrative {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .narrative p {
+            white-space: pre-wrap; /* Preserve formatting */
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            font-size: 12px;
+            color: #555;
+        }
+        @media print {
+            body {
+                margin: 0;
+                font-size: 11pt;
+            }
+            .no-print {
+                display: none;
+            }
+            .header, .content, .footer {
+                page-break-inside: avoid;
+            }
+        }
+        .print-button, .back-button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            margin-right: 10px; /* Add some space between buttons */
+        }
+        .print-button {
+            background-color: #007bff;
+        }
+        .back-button {
+            background-color: #6c757d; /* Gray color for back button */
+        }
+    </style>
+</head>
+<body>
+
+    <button onclick="window.print()" class="print-button no-print">Print this page</button>
+    <button onclick="window.location.href='{{ url_for('blotter') }}'" class="back-button no-print">Go Back to List</button>
+
+    <div class="header">
+        <h1>Barangay Blotter Record</h1>
+        <p>Barangay Pag-asa</p>
+    </div>
+
+    <div class="content">
+        <h2>Record Details (B-{{ record.id }})</h2>
+        <div class="details">
+            <p><strong>Incident Type:</strong> {{ record.incident_type }}</p>
+            <p><strong>Date & Time:</strong> {{ record.incident_datetime.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p><strong>Location:</strong> {{ record.incident_location if record.incident_location else 'N/A' }}</p>
+            <p><strong>Complainant:</strong> {{ record.complainant_name }}</p>
+            <p><strong>Respondent:</strong> {{ record.respondent_name if record.respondent_name else 'N/A' }}</p>
+            <p><strong>Status:</strong> {{ record.status }}</p>
+        </div>
+
+        <div class="narrative">
+            <h2>Narrative / Details</h2>
+            <p>{{ record.details }}</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Recorded By:</strong> {{ record.recorded_by.username if record.recorded_by else 'N/A' }}</p>
+        <p><strong>Date Recorded:</strong> {{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><strong>Last Updated:</strong> {{ record.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p><em>Printed on: {{ datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') }} UTC</em></p>
+    </div>
+
+</body>
+</html>
