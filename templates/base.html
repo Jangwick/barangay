@@ -25,7 +25,12 @@
     <!-- Sidebar -->
     <div class="bg-blue-800 text-white w-64 py-4 flex-shrink-0 hidden md:block">
         <div class="px-6">
-            <h1 class="text-2xl font-bold mb-8">Barangay System</h1>
+            <div class="p-4 flex items-center">
+                <!-- Logo -->
+                <!-- Ensure logo.jpg is inside c:\work in progress\barangay\static\images\ -->
+                <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Barangay Logo" class="h-12 w-12 mr-3 rounded-full"> 
+                <h1 class="text-2xl font-bold mb-8">Barangay System</h1>
+            </div>
             <nav>
                 <a href="{{ url_for('index') }}" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 {% if request.path == url_for('index') %}sidebar-active{% else %}hover:bg-blue-700{% endif %} mb-2">
                     <i class="fas fa-tachometer-alt mr-2"></i> Dashboard

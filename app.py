@@ -1320,7 +1320,6 @@ with app.app_context():
             trans3 = InventoryTransaction(item_id=item3.id, quantity=50, transaction_type='in', user_id=admin_user.id, notes='Initial stock')
             trans4 = InventoryTransaction(item_id=item4.id, quantity=25, transaction_type='in', user_id=admin_user.id, notes='Initial stock')
             db.session.add_all([trans1, trans2, trans3, trans4])
-            db.session.commit()
         
         # Sample Appointments
         doctor_user = User.query.filter_by(role='doctor').first()
@@ -1345,7 +1344,6 @@ with app.app_context():
                 status="completed"
             )
             db.session.add_all([appt1, appt2, appt3])
-            db.session.commit() # Commit appointments to get IDs
             
             # Sample Medical Record for the past appointment
             med_rec1 = MedicalRecord(
@@ -1362,6 +1360,30 @@ with app.app_context():
 
         db.session.commit()
         print("Sample data added successfully.")
+
+    # Add sample profile data (optional)
+    admin_user = User.query.filter_by(username='admin').first()
+    if admin_user:
+        admin_user.full_name = "Administrator"
+        admin_user.position = "System Admin"
+
+    doctor_user = User.query.filter_by(username='doctor').first()
+    if doctor_user:
+        doctor_user.full_name = "Dr. John Doe"
+        doctor_user.position = "Physician"
+
+    nurse_user = User.query.filter_by(username='nurse').first()
+    if nurse_user:
+        nurse_user.full_name = "Nurse Jane Smith"
+        nurse_user.position = "Registered Nurse"
+
+    staff_user = User.query.filter_by(username='staff').first()
+    if staff_user:
+        staff_user.full_name = "Staff Member"
+        staff_user.position = "Barangay Staff"
+
+    db.session.commit()
+    print("Sample profile data added.")
 
 if __name__ == '__main__':
     app.run(debug=True)
