@@ -39,7 +39,7 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 {% if residents %}
                     {% for resident in residents %}
-                    <tr data-id="{{ resident.id }}">
+                    <tr data-id="{{ resident.id }}" x-show="matchesSearch('{{ resident.first_name }} {{ resident.last_name }}', '{{ resident.address }}')">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="font-medium text-gray-900" data-field="firstName">{{ resident.first_name }}</div>
                             <div class="font-medium text-gray-900" data-field="lastName">{{ resident.last_name }}</div>
@@ -230,6 +230,17 @@
                     alert('An error occurred while deleting the resident. Check the console.');
                     this.deleteModalOpen = false;
                 }
+            },
+            matchesSearch(name, address) {
+                const query = this.searchQuery.toLowerCase().trim();
+                if (!query) {
+                    return true; // Show all if search is empty
+                }
+                const residentName = String(name).toLowerCase();
+                const residentAddress = String(address).toLowerCase();
+                
+                // Check if query matches name OR address
+                return residentName.includes(query) || residentAddress.includes(query);
             }
         }
     }

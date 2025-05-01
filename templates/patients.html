@@ -53,7 +53,7 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 {% if patients %}
                     {% for patient in patients %}
-                    <tr>
+                    <tr x-show="matchesSearch('{{ patient.resident.first_name }} {{ patient.resident.last_name }}')">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="font-medium text-gray-900">{{ patient.resident.first_name }} {{ patient.resident.last_name }}</div>
                             <div class="text-sm text-gray-500">{{ patient.resident.address }}</div>
@@ -104,6 +104,16 @@
             
             // In a real application, you'd implement filtering here
             // This is just a placeholder for the Alpine.js data binding
+            matchesSearch(name) {
+                const query = this.searchQuery.toLowerCase().trim();
+                if (!query) {
+                    return true; // Show all if search is empty
+                }
+                const patientName = String(name).toLowerCase();
+                
+                // Check if query matches name
+                return patientName.includes(query);
+            }
         }
     }
 </script>
