@@ -393,22 +393,45 @@ def edit_resident(id):
 @role_required(['admin', 'staff']) # Or maybe just admin
 def delete_resident(id):
     resident_to_delete = Resident.query.get_or_404(id)
-
-    # Optional: Add checks here if resident is linked to other critical data (patients, certificates)
-    # if resident_to_delete.certificates or resident_to_delete.patient_profile:
-    #     return jsonify({"error": "Cannot delete resident with associated certificates or patient profile."}), 400
+    resident_name = f"{resident_to_delete.first_name} {resident_to_delete.last_name}" # Get name early
 
     try:
-        resident_name = f"{resident_to_delete.first_name} {resident_to_delete.last_name}"
+        # --- Delete Associated Records First ---
+        # Delete associated certificates
+        Certificate.query.filter_by(resident_id=id).delete()
+        
+        # Delete associated patient profile (if exists)
+        # Need to find the patient record linked to the resident
+        patient_profile = Patient.query.filter_by(resident_id=id).first()
+        if patient_profile:
+            # Before deleting the patient, handle related records like Appointments and MedicalRecords
+            # Option 1: Cascade delete (if set up in models - requires careful setup)
+            # Option 2: Manually delete related records
+            Appointment.query.filter_by(patient_id=patient_profile.id).delete()
+            MedicalRecord.query.filter_by(patient_id=patient_profile.id).delete()
+            # Now delete the patient profile itself
+            db.session.delete(patient_profile)
+            # Note: This assumes Appointments/MedicalRecords don't have further critical links.
+            # If they do, those need to be handled too.
+
+        # --- Now Delete the Resident ---
         db.session.delete(resident_to_delete)
+        
+        # --- Commit all changes ---
         db.session.commit()
-        log_audit('Deleted resident', f'Resident ID: {id}, Name: {resident_name}')
-        return jsonify({"message": "Resident deleted successfully!"}), 200
+        
+        log_audit('Deleted resident and associated records', f'Resident ID: {id}, Name: {resident_name}')
+        return jsonify({"message": "Resident and associated records deleted successfully!"}), 200
+        
+    except IntegrityError as e: # Catch potential issues during related record deletion too
+        db.session.rollback()
+        app.logger.error(f"IntegrityError deleting resident {id} or associated records: {e}")
+        user_message = "Could not delete resident due to database constraints, even after attempting to remove associations. Check server logs."
+        return jsonify({"error": user_message}), 400 
     except Exception as e:
         db.session.rollback()
-        app.logger.error(f"Error deleting resident {id}: {e}")
-        return jsonify({"error": "An unexpected error occurred during deletion."}), 500
-
+        app.logger.exception(f"Unexpected error deleting resident {id} or associated records: {e}") 
+        return jsonify({"error": "An unexpected server error occurred during deletion. Please check server logs."}), 500
 
 @app.route('/certificates')
 @login_required
@@ -495,19 +518,24 @@ def issue_certificate():
 def delete_certificate(id):
     try:
         cert_to_delete = Certificate.query.get_or_404(id)
-        resident_name = f"{cert_to_delete.resident.first_name} {cert_to_delete.resident.last_name}"
+        # Ensure resident data is loaded before potential deletion
+        resident_name = "Unknown Resident"
+        if cert_to_delete.resident:
+            resident_name = f"{cert_to_delete.resident.first_name} {cert_to_delete.resident.last_name}"
         cert_type = cert_to_delete.type
         
         db.session.delete(cert_to_delete)
         
-        # Add Audit Log
-        log_action(f"Deleted {cert_type} for {resident_name} (ID: {id})", current_user.id)
+        # Add Audit Log - Corrected function name
+        log_audit(f"Deleted {cert_type} for {resident_name} (Cert ID: {id})") 
         
         db.session.commit()
         flash(f'Certificate (ID: {id}) deleted successfully.', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error deleting certificate: {e}', 'danger')
+        # Log the exception for debugging
+        app.logger.exception(f"Error deleting certificate {id}: {e}") 
+        flash(f'Error deleting certificate: An unexpected error occurred. Please check server logs.', 'danger')
         
     return redirect(url_for('certificates'))
 
@@ -995,19 +1023,22 @@ def inventory_history(id):
 def delete_inventory_item(id):
     item_to_delete = InventoryItem.query.get_or_404(id)
     
-    # Optional: Check if there are transactions associated. Decide if deletion is allowed.
-    if item_to_delete.transactions:
-         flash(f'Cannot delete "{item_to_delete.name}" as it has transaction history. Consider setting quantity to 0 instead.', 'warning')
-         return redirect(url_for('inventory'))
-         # Alternatively, delete transactions first or handle deletion differently.
-         # For now, we prevent deletion if history exists.
+    # Removed the check for item_to_delete.transactions
+    # The cascade="all, delete-orphan" in the InventoryItem model's relationship 
+    # to InventoryTransaction should handle deleting associated transactions.
 
-    item_name = item_to_delete.name # Get name before deleting    
-    db.session.delete(item_to_delete)
-    db.session.commit()
-    
-    log_audit('Deleted inventory item', f'Item ID: {id}, Name: {item_name}')
-    flash(f'Inventory item "{item_name}" deleted successfully.', 'success')
+    try:
+        item_name = item_to_delete.name # Get name before deleting    
+        db.session.delete(item_to_delete)
+        db.session.commit()
+        
+        log_audit('Deleted inventory item and associated transactions', f'Item ID: {id}, Name: {item_name}')
+        flash(f'Inventory item "{item_name}" and its transaction history deleted successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        app.logger.exception(f"Error deleting inventory item {id}: {e}")
+        flash(f'An error occurred while deleting inventory item "{item_to_delete.name}". Check server logs.', 'danger')
+
     return redirect(url_for('inventory'))
 
 # Medical Records
